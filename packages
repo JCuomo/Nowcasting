@@ -1,0 +1,40 @@
+matplotlib      # for all the plotting
+numpy           # for matrix handling
+torch           # for using the models
+cartopy         # for ploting with a background map and in a coordinate system (optional)
+pandas          # for the metrics
+pyart           # for reading NEXRAD data
+skimage         # for numpy version of the SSIM
+scipy           # for doing correlations in images
+IPython         # to clear the output after each epoch of the training (optional)
+
+keras           # for the baseline comparison with RainNet; data_generator.py uses as it admits pytorch or keras, but it's optional
+tensorflow      # for the baseline comparison with RainNet; data_generator.py uses as it admits pytorch or keras, but it's optional
+pysteps         # for the baseline comparison with PySteps models
+
+hyperopt        # for the examples for parameter optimization
+nexradaws       # for the examples for downloading NEXRAD data
+sh              # for the examples
+PIL             # for the examples
+imageio         # for the examples
+cv2             # for the examples
+sklearn         # for the examples
+
+
+conda config --append channels conda-forge
+conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
+pip install nexradaws
+
+
+cartopy
+arm_pyart
+keras
+tensorflow
+pysteps
+hyperopt
+
+
+
+
+
+
