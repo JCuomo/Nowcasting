@@ -17,7 +17,12 @@ class Nowcasting(nn.Module):
     def __init__(self):
         
         super(Nowcasting, self).__init__()
-        dtype = torch.cuda.FloatTensor
+         # detect if CUDA is available or not
+        use_gpu = torch.cuda.is_available()
+        if use_gpu:
+            dtype = torch.cuda.FloatTensor # computation in GPU
+        else:
+            dtype = torch.FloatTensor
 
         self.conv1  = nn.Conv3d(in_channels=1, out_channels=16, kernel_size=(3,3,3), stride=(1,1,1), padding=1, dilation=1, bias=True, padding_mode='zeros')
         self.lrelu1 = nn.LeakyReLU(negative_slope=0.02, inplace=False)

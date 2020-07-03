@@ -223,7 +223,7 @@ class Torch_Trainer():
             #torch.save(self.best_model_ssim, path + 'bestSSIM_' + self.save_filename)
         except:
             pass
-        filename = self.params['save_filename'].replace('th','param')
+        filename = self.params['save_filename'].replace('pth','param')
         with open(path + filename,'wb') as my_file_obj:
                 pickle.dump(self.params,my_file_obj) 
 
@@ -237,8 +237,9 @@ class Torch_Trainer():
             data_dir = '/data/checkpoints/'
             path = base_dir + data_dir
             ckpoint_path = path + params['save_filename']
-            
-        if cuda:
+        
+        use_gpu = torch.cuda.is_available()
+        if cuda and use_gpu:
             self.model.cuda()
             checkpoint = torch.load(ckpoint_path)
         else:

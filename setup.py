@@ -32,6 +32,6 @@ setup(
     package_dir={'': 'mlnowcasting'},  
     packages=find_packages(where='mlnowcasting'),
     python_requires='>=3.5, <4',
-    install_requires=['torch', 'matplotlib', 'numpy', 'pandas', 'pyart', 'skimage', 'scipy'],  # Optional
+    install_requires=['matplotlib', 'numpy', 'pandas', 'scikit-image', 'scipy'],  # Optional
     license=license,
 )

@@ -16,7 +16,12 @@ class RNN(nn.Module):
     def __init__(self, H_W, in_channels, out_channels, k=(3,3), n_layers=1):
         
         super(RNN, self).__init__()
-        dtype = torch.cuda.FloatTensor
+         # detect if CUDA is available or not
+        use_gpu = torch.cuda.is_available()
+        if use_gpu:
+            dtype = torch.cuda.FloatTensor # computation in GPU
+        else:
+            dtype = torch.FloatTensor
 
         self.rnn = ConvGRU(input_size = tuple([int(x) for x in H_W]),
                            input_dim = in_channels,

@@ -37,6 +37,8 @@ def any2reflectivity(data, verbose=False):
     if isinstance(data, torch.Tensor):
         if data.is_cuda:
             data = data.cpu().detach().numpy()
+        else:
+            data = data.numpy()
    
     if np.max(data) < 3:
         if verbose: print("pixel [0-1]")
