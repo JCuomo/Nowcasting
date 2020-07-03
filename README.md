@@ -2,10 +2,11 @@
 This repository has all the necessary to start doing video prediction specially focus in radar weather data from the NEXRAD network.
 
 # Usage
-In the "examples" directory there are plenty of jupyter notebook examples to start on that.
+In the "examples" directory there are plenty of jupyter notebook examples to start on that.  
+
 The standard dimensions used are:
-  - dataset: (samples, frames, height, width); 
-    if developing you will encounter that the models use: (samples, channels, frames, height, width), where channels should be 1 at the input and the output and only increase/decrease within the model.
+  - dataset: (samples, frames, height, width);  
+    *if developing you will encounter that the models use: (samples, channels, frames, height, width), where channels should be 1 at the input and the output and only increase/decrease within the model.*
 
 # Installation  
 *GPU is necessary for training models*  
