@@ -6,6 +6,9 @@ import numpy as np
 # generic data generator supporting PyTorch
 
 def get_data_generator(framework, dataset, batch_size=4, in_frame=10, out_frame=10, step=1, fix=False):
+    '''
+    wrapper function to return Data_Generator for keras or pytorch. See Data_Generator help for arguments.
+    '''
     if framework=='torch':
         from torch.utils.data import Dataset
         from torch import tensor

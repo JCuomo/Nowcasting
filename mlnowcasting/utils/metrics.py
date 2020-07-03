@@ -88,6 +88,8 @@ def events_metrics(target, prediction, th_dbz=20, plot=False, printT=True, N=Non
     Returns:
         metric_stat: all samples metrics, in the same order as list returned by _get_metric_names()
     '''
+    target = any2reflectivity(target)
+    prediction = any2reflectivity(prediction) 
 
     th = th_dbz
     

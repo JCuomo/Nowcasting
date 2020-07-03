@@ -1,3 +1,8 @@
+# in production code not ready
+under_developement/
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

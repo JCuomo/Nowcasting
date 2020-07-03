@@ -16,13 +16,30 @@ from .torch_ssim import ssim
 from .plot_utils import plot_obs_pred
 
 def SSIM(output, target):
+    '''
+    Input:
+        should be 5D (samples, channels, frames, heigth, width).
+    Return:
+        the structural similarity between two matrices. 
+        (using only first dimension of channels, so it should have 1 channel to make it work)
+    '''
     return ssim(output[:,0,...], target[:,0,...], size_average=1, data_range=1)
 
 
 class Torch_Trainer():
 
     def __init__(self, train_data, val_data, get_model, get_loss_fx):
-
+        '''
+        Handles a pytorch models. 
+         - If used for training give all arguments. 
+         - If used for making predictions only the model is important -> Torch_Trainer(None, None, get_model, None)
+        Inputs:
+            train_data: training dataset path
+            val_data: validation dataset path
+            get_model: function that returns a model
+                TODO: the arguments that this functions take are hardcoded, so it would be nice to make it parametric
+            get_loss_fx: function that takes two matrices and returns the error between those
+        '''
         self.train_data = train_data
         self.val_data = val_data
         self.get_model = get_model
@@ -30,26 +47,59 @@ class Torch_Trainer():
         self.model = None
         
     def train(self, params):
+        '''
+        * page references are from the thesis "Machine Learning models applied to Stom Nowcasting"
+        
+        Trains a pytorch model.
+            Verbose is done through "show" key in 'params'.
+            The optimizer is Adam.
+            Uses a data_generator to fetch data chunk by chunk.
+        Inputs:
+            params: dictionary with all the parameters. If some keys are missing, the default values are use.
+                  weight_decay   : 0,               # Parameter of the optimizer
+                  eps            : 1e-08,           # Parameter of the optimizer
+                  beta1          : 0.9,             # Parameter of the optimizer
+                  beta2          : 0.999,           # Parameter of the optimizer
+                  lr             : 0.0001,          # Learning rate
+                  lr_steps       : 3,               # Steps evenly distributed across the max_epochs to reduce by 0.7 the learning rate
+                  max_epochs     : 100,             # Maximum number of epochs to run the training
+                  batch          : 4,               # Number of samples processed at a time
+                  log_interval   : 10,              # Every how many epochs the verbose is shown
+                  th             : -                # Use only with 'mode=bin' to binarize the targets.
+                  show           : True,            # Verbose flag
+                  fix            : False,           # How to handle events longer than needed. False: random section is used on each epoch. True: mid point is fixed, same every epoch. (*pag. 33)
+                  save_filename  : 'unnamed.pth',   # Name of the checkpoint, suggestion "architecture_framesIn_framesOut_loss.pth"
+                  # model params
+                  mode           : 'absolute',      # absolute, bin: targets a Z above 'th', diff:relative to the last context frame (*pag. 22)
+                  in_frames      : 16,              # Number of input frames (context)
+                  out_frames     : 16,              # Number of output frames (prediction)
+                  step           : 1,               # Number of skipped frames (*pag. 34)
+                  dropout        : 0.0,             # Parameter of dropout layers. TODO: implemented on some models only.
+                  n_filter       : 128              # Initial number of filters/channels/features of convolutional layers.
+                  
+                 
+        '''
 
-        mode            = params['mode']  if 'mode' in params else 'absolute'  # options = absolute, diff, bin
+          
         weight_decay    = params['weight_decay']  if 'weight_decay' in params else 0.0
         eps             = params['eps']           if 'eps'          in params else 1e-08
-        beta1           = params['beta1']         if 'beta1'        in params else 0.9
+        beta1           = params['beta1']         if 'beta1'        in params else 0.9      
         beta2           = params['beta2']         if 'beta2'        in params else 0.999
         lr              = params['lr']            if 'lr'           in params else 0.0001
         lr_steps        = params['lr_steps']      if 'lr_steps'     in params else 3
-        n_filter        = params['n_filter']      if 'n_filter'     in params else 128
-        max_epochs      = params['max_epochs']    if 'max_epochs'   in params else 300
+        max_epochs      = params['max_epochs']    if 'max_epochs'   in params else 100
         batch           = params['batch']         if 'batch'        in params else 4
-        in_frames       = params['in_frames']     if 'in_frames'    in params else 16
-        out_frames      = params['out_frames']    if 'out_frames'   in params else 16
         log_interval    = params['log_interval']  if 'log_interval' in params else 10
         show            = params['show']          if 'show'         in params else True        
-        dropout         = params['dropout']       if 'dropout'      in params else 0.0
+        fix             = params['fix']           if 'fix'          in params else False   
+        mode            = params['mode']  if 'mode' in params else 'absolute'  # options = absolute, diff, bin
+        in_frames       = params['in_frames']     if 'in_frames'    in params else 16
+        out_frames      = params['out_frames']    if 'out_frames'   in params else 16
         step            = params['step']          if 'step'         in params else 1
-        fix             = params['fix']           if 'fix'          in params else False
+        dropout         = params['dropout']       if 'dropout'      in params else 0.0
+        n_filter        = params['n_filter']      if 'n_filter'     in params else 128
 
-        self.save_filename  = params['save_filename']  if 'save_filename' in params else 'checkpoint.pth'
+        self.save_filename  = params['save_filename']  if 'save_filename' in params else 'unnamed.pth'
         self.params = params
         
         self.out_frames = out_frames
@@ -84,7 +134,8 @@ class Torch_Trainer():
         lr_acum = []
         best_vloss = 1000
         best_vssim = 0
-        # Checkpoint
+        
+        # Load Checkpoint to resume training if available
         start_epoch = 0
         best_accuracy = torch.tensor(0).float()
         try:
@@ -131,6 +182,8 @@ class Torch_Trainer():
             if epoch > 0:
             	train_loss_values.append(epoch_tloss)
             self.model.eval()
+            
+            
             # Validation
             running_loss = 0.0
             acum_ssim = 0.0
@@ -168,11 +221,13 @@ class Torch_Trainer():
                     state_dict = copy.deepcopy(self.model.state_dict())
                     self.best_model_loss = {'epoch': self.epoch + 1,'state_dict': state_dict,'best_accuracy': best_vloss}
 
+                # To save a model checkpoint based on the SSIM
                 #if epoch_vssim > best_vssim:
                 #    best_vssim = epoch_vssim
                 #    state_dict = copy.deepcopy(self.model.state_dict())
                 #    self.best_model_ssim = {'epoch': self.epoch + 1,'state_dict': state_dict,'best_accuracy': epoch_vloss}
  
+            # Verbose
             if epoch % log_interval == 0 and show==True and epoch > 0:
                 try:
                     clear_output()
@@ -206,10 +261,22 @@ class Torch_Trainer():
                 plt.tight_layout()
                 plt.show()
 
-        return epoch_vloss
+        try:
+            return epoch_vloss
+        except:
+            print("No training happend. \n Make sure there is not a checkpoint trained for the same epochs you are trying to train.")
 
 
     def save_checkpoint(self, path=None):
+        '''
+        Save checkpoints.
+        Inputs:
+            path: optional directoy where to save the checkpoint. Default location: mlnowcasting/data/checkpoints/
+        
+        TODO: as shown in *pag. 39, stopping training when validation loss is at the minimum should be the best possible checkpoint. 
+        So, implement stopping when validation loss starts increasing (use histeresis to missinterpretate noise as minimum)
+        You can comment/uncomment the 3 saving in the fx as what suits you best. They are just to reproduce results.
+        '''
         if path==None:
             base_dir = str(Path(__file__).parent.parent.parent)
             data_dir = '/data/checkpoints/'
@@ -229,6 +296,15 @@ class Torch_Trainer():
 
 
     def load_checkpoint(self, params, ckpoint_path=None , cuda=True, verbose=True):
+        '''
+        Load a checkpoint, to make predictions or to resume training.
+        Inputs:
+            params: see Class help
+            ckpoint_path: checkpoint path. 
+                If not given it looks for the checkpoint in mlnowcasting/data/checkpoints/ with the name of the params['save_filename']
+            cuda: if True try to uses GPU
+            verbose: print information
+        '''
         if not self.model:
             self.model = self.get_model(params['n_filter'], params['dropout']).float()
             
