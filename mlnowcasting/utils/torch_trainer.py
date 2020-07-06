@@ -104,10 +104,7 @@ class Torch_Trainer():
         
         self.out_frames = out_frames
 
-        # CUDA for PyTorch
-        use_cuda = torch.cuda.is_available()
-        device = torch.device("cuda:0" if use_cuda else "cpu")
-        torch.backends.cudnn.benchmark = True
+
 
         # Generators
         training_set   = get_data_generator('torch',self.train_data,batch_size=batch,
@@ -119,7 +116,18 @@ class Torch_Trainer():
         validation_generator = data.DataLoader(validation_set, shuffle=False, num_workers=0)
 
         self.model = self.get_model(n_filter, dropout).float()
-
+        
+         # CUDA for PyTorch
+        use_cuda = torch.cuda.is_available()
+        device = torch.device("cuda:0" if use_cuda else "cpu")
+        torch.backends.cudnn.benchmark = True  # automatically detects best algorithm for the running machine     
+        
+        # Multi-GPU
+        n_gpus = torch.cuda.device_count()
+        if n_gpus > 1:
+            print("Using",n_gpus, "GPUs")
+            model = nn.DataParallel(model)
+            
         # Optimizer
         optimizer = torch.optim.Adam(self.model.parameters(), lr=lr, betas=(beta1, beta2), eps=eps, weight_decay=weight_decay)
         LR_step_size = int(max_epochs/lr_steps)
