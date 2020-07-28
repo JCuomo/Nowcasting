@@ -255,7 +255,7 @@ def metric_plots(target, prediction, time_res=5, th_dbz=20, std_lines=True, fig=
     # ranges for each metric. Should match _get_metric_names() order
     ranges = [None, (0,1), (0,1), (0,1), (-0.33,1), (0,1), None, (0,1)]
     # defines the time axis array
-    time = np.linspace(1*time_res, n_frames*time_res, n_frames, dtype='uint8')
+    time = np.linspace(1*time_res, n_frames*time_res, n_frames)
     # if no fig or axs were give, create them
     if not fig and not axs :
         fig, axs = plt.subplots(nrows=rows, ncols=cols, figsize=(15,rows*3.5));

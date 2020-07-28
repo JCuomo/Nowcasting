@@ -28,6 +28,7 @@ def composite_prediction(dataset, base_model_file, N=None):
             try:
                 layers[i], target = predict(dataset, th_layer_file, N=N) 
             except Exception as e: 
+                print(e)
                 pass
 
     first = True
@@ -36,7 +37,7 @@ def composite_prediction(dataset, base_model_file, N=None):
             composite = layers[i] # base layer
             first = False
         else:
-            layer_binzarize = np.where(layers[i]>35, ths[i], 0) # 35 is the threshold as it's the half of 70 dBZ
+            layer_binzarize = np.where(layers[i]>0.5, ths[i], 0) 
             composite = np.maximum(composite,layer_binzarize)
     return composite, target, layers
 

@@ -19,9 +19,12 @@ def rainnet(context):
     with HiddenPrints():
         from keras.models import load_model
         from tensorflow.keras.backend import clear_session
-
+        from keras import backend as K
         import copy
         import numpy as np
+        
+        clear_session()
+        K.clear_session()
         model = load_model('../data/checkpoints/RainNet.h5')       
 
         obs = copy.copy(context)
@@ -42,4 +45,5 @@ def rainnet(context):
         del model
         del obs
         del pred
+        del context
         return prediction

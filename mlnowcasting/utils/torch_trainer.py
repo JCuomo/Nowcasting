@@ -14,6 +14,7 @@ import pickle
 from .data_generator import get_data_generator
 from .torch_ssim import ssim
 from .plot_utils import plot_obs_pred
+from .utils import binarize
 
 def SSIM(output, target):
     '''
@@ -65,7 +66,7 @@ class Torch_Trainer():
                   max_epochs     : 100,             # Maximum number of epochs to run the training
                   batch          : 4,               # Number of samples processed at a time
                   log_interval   : 10,              # Every how many epochs the verbose is shown
-                  th             : -                # Use only with 'mode=bin' to binarize the targets.
+                  th             : 0                # Use only with 'mode=bin' to binarize the targets.
                   show           : True,            # Verbose flag
                   fix            : False,           # How to handle events longer than needed. False: random section is used on each epoch. True: mid point is fixed, same every epoch. (*pag. 33)
                   save_filename  : 'unnamed.pth',   # Name of the checkpoint, suggestion "architecture_framesIn_framesOut_loss.pth"
@@ -90,6 +91,7 @@ class Torch_Trainer():
         max_epochs      = params['max_epochs']    if 'max_epochs'   in params else 100
         batch           = params['batch']         if 'batch'        in params else 4
         log_interval    = params['log_interval']  if 'log_interval' in params else 10
+        th              = params['th']/70         if 'th'           in params else 0
         show            = params['show']          if 'show'         in params else True        
         fix             = params['fix']           if 'fix'          in params else False   
         mode            = params['mode']  if 'mode' in params else 'absolute'  # options = absolute, diff, bin
@@ -244,10 +246,10 @@ class Torch_Trainer():
                 print('Train Epoch: {} Loss: {:.6f} Val_Loss: {:.6f}'.format(epoch, epoch_tloss, epoch_vloss))
                 val_output = val_output[0,0].detach().cpu().numpy()
                 val_target = val_target[0,0].detach().cpu().numpy()
-                plot_obs_pred(val_output, val_target)
+                plot_obs_pred(val_target,val_output)
                 if mode=='diff':
                     val_base = val_base[0,0].detach().cpu().numpy()
-                    self.plot_obs_pred(val_output+val_base, val_target+val_base)
+                    plot_obs_pred(val_target+val_base, val_output+val_base)
 
                 plt.figure(figsize=(15,4))
                 plt.subplot(1,3,1)

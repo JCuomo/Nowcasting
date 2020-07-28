@@ -12,6 +12,7 @@ keras           # for the baseline comparison with RainNet; data_generator.py us
 tensorflow      # for the baseline comparison with RainNet; data_generator.py uses as it admits pytorch or keras, but it's optional
 pysteps         # for the baseline comparison with PySteps models
 
+jupyter         # for the examples
 hyperopt        # for the examples for parameter optimization
 nexradaws       # for the examples for downloading NEXRAD data
 sh              # for the examples

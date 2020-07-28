@@ -24,6 +24,6 @@ Install the package
 At this point you should be able to run prediction, like in "examples/How to make predictions"  
 The following packages will allow you to use every functionality, if you don't want to go for all read above what each package is used for.  
 `pip install nexradaws`  
-`conda install cartopy arm_pyart IPython pysteps hyperopt sh pillow imageio opencv scikit-learn`  
+`conda install cartopy arm_pyart IPython pysteps hyperopt sh pillow imageio opencv scikit-learn jupyter`  
 if GPU: `conda install tensorflow-gpu keras`  
 if CPU: `conda install tensorflow keras `   
