@@ -61,7 +61,6 @@ elif [ $startdate -ge $enddate ] ; then
 fi
 
 
-number_of_days=0;
 start_date="$(date --date="$startdate" +'%s')"
 end_date="$(date --date="$enddate" +'%s')"
 
