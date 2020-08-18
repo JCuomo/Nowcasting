@@ -10,6 +10,10 @@ Each of them basicly works like this:
 To run the scripts:
 
 
+# download NEXRAD data
+bash download_data.sh
+
+
 # unzip files 
 (if using AWS they are already unzipped)
 bash unzip.sh <dirextory_containing_gz_files>
