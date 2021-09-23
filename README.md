@@ -1,6 +1,10 @@
 # Nowcasting
 This repository has all the necessary to start doing video prediction specially focus in radar weather data from the NEXRAD network.
 
+# Papers related to this repository:
+ - https://ieeexplore.ieee.org/document/9542945
+ - https://journals.ametsoc.org/view/journals/atot/aop/JTECH-D-21-0012.1/JTECH-D-21-0012.1.xml
+ 
 # Usage
 In the "examples" directory there are plenty of jupyter notebook examples to start on that.  
 
