@@ -193,7 +193,7 @@ def get_map(ax,corners=[-98.900450,-95.705828,31.220247,33.931325],
     # draw concentric circles
     for radio in radius:
         ax.tissot(rad_km=radio, lons = center[0], lats = center[1], 
-                  n_samples = 36, facecolor = '', edgecolor = 'black', linewidth = 1, alpha = 1, linestyle='-.')
+                  n_samples = 36, facecolor = 'none', edgecolor = 'black', linewidth = 1, alpha = 1, linestyle='-.')
                                         
     # returns the kwargs for more drawings outside this function, to have the coordinates
     kwargs = {"origin" : "upper", "extent" : corners, "transform" : ccrs.PlateCarree(), "zorder": 0.5}
